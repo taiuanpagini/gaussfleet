@@ -1,8 +1,23 @@
 import React from 'react';
-import { Text } from 'react-native';
+import { LogBox } from 'react-native';
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
 
 import './config/ReactotronConfig';
 
-export default function App() {
-  return <Text>Tete</Text>;
+import { store, persistor } from './store';
+import App from './App';
+
+export default function Index() {
+  LogBox.ignoreAllLogs(true);
+
+  return (
+    <>
+      <Provider store={store}>
+        <PersistGate persistor={persistor}>
+          <App />
+        </PersistGate>
+      </Provider>
+    </>
+  );
 }
