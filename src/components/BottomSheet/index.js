@@ -1,11 +1,10 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
   View,
   Text,
   FlatList,
   TouchableOpacity,
   StyleSheet,
-  Platform,
 } from 'react-native';
 
 import { Icon } from 'react-native-eva-icons';
@@ -28,7 +27,7 @@ const style = StyleSheet.create({
   },
   btnCancelar: {
     fontSize: 16,
-    color: '#2bbfc3',
+    color: '#FF5B57',
     fontWeight: '600',
   },
   containerBtnOptions: {
@@ -48,10 +47,14 @@ const style = StyleSheet.create({
     borderTopColor: '#efefef',
     borderTopWidth: 1,
   },
+  fontOption: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#888',
+  },
 });
 
 export default function BottomSheet({ activeMenu, abreMenu, options }) {
-
   function onCancelOptions() {
     abreMenu();
   }
@@ -88,13 +91,13 @@ export default function BottomSheet({ activeMenu, abreMenu, options }) {
                 ]}
               >
                 <Icon
-                  fill="#2bbfc3"
+                  fill="#FF5B57"
                   name={item.icon}
                   width={28}
                   height={28}
                   style={style.icon}
                 />
-                <Text>{item.title}</Text>
+                <Text style={style.fontOption}>{item.title}</Text>
               </TouchableOpacity>
             )}
             contentContainerStyle={style.containerOptions}
