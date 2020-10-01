@@ -6,9 +6,13 @@ import React, {
 } from 'react';
 import { ActivityIndicator, Alert } from 'react-native';
 import { useDispatch } from 'react-redux';
+import NetInfo from '@react-native-community/netinfo';
+
 import BottomSheet from '~/components/BottomSheet';
 import ButtonsRight from '~/components/ButtonsRight';
+import { executeQueryInterno } from '~/services/dbUtil';
 import { GetUsers } from '~/services/Users/GetUsers';
+import { selectUsers } from '~/sql/users';
 import { signOut } from '~/store/modules/auth/actions';
 import {
   Container,
@@ -20,7 +24,9 @@ import {
   DataUser,
   Nome,
   Email,
+  EmptyUser,
 } from './styles';
+import FloatingButton from '~/components/FloatingButton';
 
 export default function Home({ navigation }) {
   const dispatch = useDispatch();
@@ -36,8 +42,18 @@ export default function Home({ navigation }) {
     setUsers(data);
   }
 
+  async function GetUsersDB() {
+    const usersDb = await executeQueryInterno(selectUsers());
+
+    setUsers(usersDb);
+    setLoading(false);
+  }
+
   useEffect(() => {
-    GetUsers(returnRequest);
+    NetInfo.fetch().then((state) => {
+      GetUsersDB();
+      if (state.isConnected) GetUsers(returnRequest);
+    });
   }, []);
 
   function handleFilter(value) {
@@ -144,7 +160,12 @@ export default function Home({ navigation }) {
                 </DataUser>
               </ContainerUser>
             )}
+            ListEmptyComponent={
+              <EmptyUser>Nenhum usuário encontrado</EmptyUser>
+            }
           />
+
+          <FloatingButton />
         </>
       )}
 

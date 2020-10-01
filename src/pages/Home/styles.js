@@ -46,3 +46,7 @@ export const Nome = styled.Text`
 `;
 
 export const Email = styled.Text``;
+
+export const EmptyUser = styled.Text`
+  text-align: center;
+`;

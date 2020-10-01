@@ -3,6 +3,8 @@ import { Alert } from 'react-native';
 import { all, takeLatest, call, put } from 'redux-saga/effects';
 
 import api from '~/services/api';
+import { executeQuery, executeQueryInterno } from '~/services/dbUtil';
+import { insertProfile, selectProfile } from '~/sql/profile';
 import { signInSuccess, signFailure } from './actions';
 
 export function* signIn({ payload }) {
@@ -24,56 +26,19 @@ export function* signIn({ payload }) {
     }
 
     yield put(signInSuccess(data.token));
+    executeQuery(insertProfile(1, data.token));
   } catch (err) {
-    Alert.alert(
-      'Falha na autenticação',
-      'Houve um erro no login, verifique seus dados.'
-    );
-    yield put(signFailure());
-  }
-}
+    const profile = yield executeQueryInterno(selectProfile());
 
-export function* signUp({ payload }) {
-  try {
-    const {
-      name,
-      email,
-      phone,
-      start_hour,
-      end_hour,
-      start_lunch,
-      end_lunch,
-      password,
-    } = payload;
-
-    yield call(api.post, '/users', {
-      name,
-      email,
-      phone,
-      start_hour,
-      end_hour,
-      start_lunch,
-      end_lunch,
-      password,
-    });
-
-    const responseSession = yield call(api.post, '/sessions', {
-      email,
-      password,
-    });
-
-    const { token, user } = responseSession.data;
-
-    api.defaults.headers.Authorization = `Bearer ${token}`;
-
-    yield put(signInSuccess(token, user));
-  } catch (err) {
-    Alert.alert(
-      'Falha no cadastro',
-      'Houve um erro no cadastro, verifique seus dados!'
-    );
-
-    yield put(signFailure());
+    if (profile) {
+      yield put(signInSuccess(profile[0].token));
+    } else {
+      Alert.alert(
+        'Falha na autenticação',
+        'Houve um erro no login, verifique seus dados.'
+      );
+      yield put(signFailure());
+    }
   }
 }
 
@@ -92,6 +57,5 @@ export function signOut() {}
 export default all([
   takeLatest('persist/REHYDRATE', setToken),
   takeLatest('@auth/SIGN_IN_REQUEST', signIn),
-  takeLatest('@auth/SIGN_UP_REQUEST', signUp),
   takeLatest('@auth/SIGN_OUT', signOut),
 ]);

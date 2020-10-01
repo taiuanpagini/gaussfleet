@@ -18,6 +18,7 @@ import logo from '~/assets/image/logo.png';
 import { executeQuery } from '~/services/dbUtil';
 import { createTableProfile } from '~/sql/profile';
 import { signInRequest } from '~/store/modules/auth/actions';
+import { createTableUsers } from '~/sql/users';
 
 export default function Login() {
   const passwordRef = useRef();
@@ -30,6 +31,7 @@ export default function Login() {
 
   useEffect(() => {
     executeQuery(createTableProfile());
+    executeQuery(createTableUsers());
   }, []);
 
   async function handleSubmit() {
